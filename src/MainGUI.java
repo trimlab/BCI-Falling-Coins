@@ -1,5 +1,8 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -28,6 +31,18 @@ public class MainGUI extends JFrame implements KeyListener {
 		this.setMinimumSize(new Dimension(PANEL_X, PANEL_Y));
 		this.getContentPane().setBackground(Color.BLACK);
 		this.setVisible(true);
+
+
+	}
+
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		Graphics2D g2D = (Graphics2D) g;
+		RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+		g2D.setRenderingHints(rh);
+		BUCKET.draw(g);
 	}
 
 	@Override
@@ -47,5 +62,7 @@ public class MainGUI extends JFrame implements KeyListener {
 		// TODO Auto-generated method stub
 
 	}
+
+
 
 }
