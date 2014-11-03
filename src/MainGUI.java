@@ -1,9 +1,9 @@
-import java.awt.Graphics;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 /**
  *
@@ -11,40 +11,40 @@ import javax.swing.JPanel;
  *
  */
 
-public class MainGUI extends JFrame{
-	
+public class MainGUI extends JFrame implements KeyListener {
+	private final Bucket BUCKET;
+	private final int PANEL_X = 640;
+	private final int PANEL_Y = 640;
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public MainGUI() {
+		super("BCI Falling Coins");
+		BUCKET = new Bucket();
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setMinimumSize(new Dimension(PANEL_X, PANEL_Y));
+		this.getContentPane().setBackground(Color.BLACK);
+		this.setVisible(true);
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 
-	public void init() {
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 
-	private class MyJPanel extends JPanel implements KeyListener {
-
-		@Override
-		public void paintComponent(Graphics g) {
-			super.paintComponent(g);
-		}
-
-		@Override
-		public void keyPressed(KeyEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void keyReleased(KeyEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void keyTyped(KeyEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 
