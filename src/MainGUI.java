@@ -34,9 +34,9 @@ public class MainGUI extends JFrame implements KeyListener {
 		super("BCI Falling Coins");
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setMinimumSize(new Dimension(PANEL_X, PANEL_Y));
+
 		// this.setPreferredSize(new Dimension(PANEL_X + 10, PANEL_Y));
-		this.setBackground(Color.BLACK);
+		// this.setBackground(Color.BLACK);
 		this.setVisible(true);
 		this.addKeyListener(this);
 
@@ -45,6 +45,7 @@ public class MainGUI extends JFrame implements KeyListener {
 
 			@Override
 			public void paintComponent(Graphics g) {
+				super.paintComponent(g);
 
 				Graphics2D g2D = (Graphics2D) g;
 				RenderingHints rh = new RenderingHints(
@@ -52,10 +53,16 @@ public class MainGUI extends JFrame implements KeyListener {
 						RenderingHints.VALUE_ANTIALIAS_ON);
 				g2D.setRenderingHints(rh);
 				BUCKET.draw(g);
+				g.setColor(Color.LIGHT_GRAY);
+				g.fillRect(0, 540, PANEL_X, 2);
+				g.drawRect(0, 0, PANEL_X - 1, PANEL_Y - 1);
 			}
 		};
-		drawablePanel.setOpaque(true);
+		// drawablePanel.setOpaque(true);
 		this.add(drawablePanel);
+		drawablePanel.setPreferredSize(new Dimension(PANEL_X, PANEL_Y));
+		drawablePanel.setBackground(Color.BLACK);
+		this.pack();
 		// drawablePanel.setSize(new Dimension(PANEL_X, PANEL_Y));
 		BUCKET = new Bucket(PANEL_X);
 		Timer timer = createTimer();
@@ -64,9 +71,6 @@ public class MainGUI extends JFrame implements KeyListener {
 
 	}
 
-	public void paintComponent(Graphics g) {
-
-	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
@@ -107,7 +111,7 @@ public class MainGUI extends JFrame implements KeyListener {
 			}
 		};
 		// Return the timer which ticks ~.005 s
-		return new Timer(10, actionListener);
+		return new Timer(5, actionListener);
 	}
 
 	@Override
