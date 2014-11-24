@@ -67,6 +67,11 @@ public class MainGUI extends JFrame implements KeyListener {
 
 		JPanel drawablePanel = new JPanel() {
 
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);

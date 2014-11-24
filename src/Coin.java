@@ -7,11 +7,8 @@ public class Coin {
 	private final int VELOCITY = 2;
 	private final int RADIUS = 10;
 	public final int WIDTH;
-	private final int SCALE = 1;
-	private static final int START_LOCATION = 0;
 	private static final int KILL_LOCATION = 500;
 	private static int WINDOW_WIDTH = 0;
-	private static double distanceFall = 0;
 	private boolean collected;
 
 	public Coin(double percentage) {

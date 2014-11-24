@@ -20,6 +20,7 @@ public class Main {
 		try {
 			Scanner scan = new Scanner(new File(args[0]));
 			duration = scan.nextInt();
+			scan.close();
 		} catch (FileNotFoundException fnf) {
 			try {
 				duration = Integer.parseInt(args[0]);
@@ -31,7 +32,7 @@ public class Main {
 			}
 		}
 
-		MainGUI mainGUI = new MainGUI(duration, args[1], args[2]);
+		new MainGUI(duration, args[1], args[2]);
 
 	}
 
