@@ -4,7 +4,7 @@ import java.awt.Graphics;
 public class Coin {
 	private int x;
 	private int y;
-	private final int VELOCITY = 2;
+	private final int VELOCITY = 1;
 	private final int RADIUS = 10;
 	public final int WIDTH;
 	private static final int KILL_LOCATION = 500;
