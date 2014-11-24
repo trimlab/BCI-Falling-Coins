@@ -14,7 +14,7 @@ Run
 ---------
 Run from the system command prompt (or terminal).
 For Windows users, use the following command:
-	java -jar /path/to/the/jar.jar <arg1> <arg2> <arg3>
+    java -jar /path/to/the/jar.jar <arg1> <arg2> <arg3>
 - arg1: The file that contains the testing duration OR an integer that is the testing duration.
 - arg2: The name of the file where the data from the test will be stored (if it already exists, the new data will be appended, if it doesn't a new file will be created)
 - arg3: The ID code for the test
