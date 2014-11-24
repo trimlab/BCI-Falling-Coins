@@ -7,6 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -24,24 +31,33 @@ public class MainGUI extends JFrame implements KeyListener {
 	private final int PANEL_X = 640;
 	private final int PANEL_Y = 640;
 	private int motion = 0;
-	private int coinNum = 0;
-	private boolean run = true;
-	private Coin[] coins;
+	private boolean run = false;
+	private LinkedList<Coin> coins = new LinkedList<Coin>();
+	private final long START_TIME;
+	private final long DURATION;
+	private final String TEST_ID;
+	private final String OUTPUT_FILE;
+	private int left = 0;
+	private int right = 0;
+	private int zero = 0;
+	private Timer timer;
+	private Random random;
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public MainGUI(double[] coinLocations) {
+	public MainGUI(int testDuration, String outputFile, String testID) {
 		super("BCI Falling Coins");
-		
+		OUTPUT_FILE = outputFile;
+		TEST_ID = testID;
+		random = new Random(System.nanoTime());
+		DURATION = (long) (testDuration * Math.pow(10, 9));
 		Coin.setWindowWidth(PANEL_X);
-		
-		coins = new Coin[coinLocations.length];
-		for(int i = 0; i < coinLocations.length; i++){
-			coins[i] = new Coin(coinLocations[i]);
-		}
+
+		coins.addLast(new Coin(random.nextDouble()));
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// this.setPreferredSize(new Dimension(PANEL_X + 10, PANEL_Y));
@@ -49,24 +65,23 @@ public class MainGUI extends JFrame implements KeyListener {
 		this.setVisible(true);
 		this.addKeyListener(this);
 
-
 		JPanel drawablePanel = new JPanel() {
 
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
 
-				//Graphics2D g2D = (Graphics2D) g;
+				// Graphics2D g2D = (Graphics2D) g;
 				RenderingHints rh = new RenderingHints(
 						RenderingHints.KEY_ANTIALIASING,
 						RenderingHints.VALUE_ANTIALIAS_ON);
-				((Graphics2D)g).setRenderingHints(rh);
-			
+				((Graphics2D) g).setRenderingHints(rh);
+
 				g.setColor(Color.LIGHT_GRAY);
 				g.fillRect(0, 540, PANEL_X, 2);
 				g.drawRect(0, 0, PANEL_X - 1, PANEL_Y - 1);
-				if(run)
-					coins[coinNum].draw(g);
+				if (run)
+					coins.getLast().draw(g);
 				BUCKET.draw(g);
 			}
 		};
@@ -77,27 +92,81 @@ public class MainGUI extends JFrame implements KeyListener {
 		this.pack();
 		// drawablePanel.setSize(new Dimension(PANEL_X, PANEL_Y));
 		BUCKET = new Bucket(PANEL_X);
-		Timer timer = createTimer();
+		timer = createTimer();
 		timer.start();
-
+		run = true;
+		START_TIME = System.nanoTime();
 
 	}
-	
-	private void exit(){
+
+	private void exit() {
 		run = false;
-	}
+		long stop = System.nanoTime();
+		timer.stop();
+		// System.out.println((stop - START_TIME));
+		int collected = 0;
+		int failed = 0;
+		for (Coin coin : coins) {
+			if (coin.getSuccess()) {
+				collected++;
+			} else {
+				failed++;
+			}
+		}
+		String header = "ID,COLLECTED,UNCOLLECTED,TOTAL,LEFT,ZERO,RIGHT,DURATION (s),";
+		String content = TEST_ID + "," + collected + "," + failed + ","
+				+ (collected + failed) + "," + left + "," + zero + "," + right
+				+ "," + (stop - START_TIME) / Math.pow(10, 9) + ",";
+		System.out.println(header);
+		System.out.println(content);
 
+		File f;
+		if (OUTPUT_FILE.length() > 4 && OUTPUT_FILE.endsWith(".csv")) {
+			f = new File(OUTPUT_FILE);
+		} else {
+			f = new File(OUTPUT_FILE + ".csv");
+		}
+
+		boolean addheader = !f.exists();
+
+		try {
+			PrintWriter out = new PrintWriter(new BufferedWriter(
+					new FileWriter(f, true)));
+			if (addheader) {
+				out.println(header);
+			}
+			out.println(content);
+			out.close();
+		} catch (IOException fnf) {
+			System.out.println("ERROR");
+		}
+		System.exit(0);
+	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		char test = e.getKeyChar();
 		// System.out.println(test);
+		int motionOld = motion;
 		if (test == 'a') {
 			motion = -1;
 		} else if (test == 's') {
 			motion = 0;
 		} else if (test == 'd') {
 			motion = 1;
+		}
+		if (motionOld != motion) {
+			switch (motion) {
+			case -1:
+				left++;
+				break;
+			case 0:
+				zero++;
+				break;
+			case 1:
+				right++;
+				break;
+			}
 		}
 
 	}
@@ -108,6 +177,10 @@ public class MainGUI extends JFrame implements KeyListener {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				// checks to see if program is supposed to be running
+				if ((System.nanoTime() - START_TIME) > DURATION) {
+					exit();
+				}
+
 				if (run) {
 					// Redraw the window
 					// System.out.println(motion);
@@ -122,13 +195,18 @@ public class MainGUI extends JFrame implements KeyListener {
 						BUCKET.moveRight();
 						break;
 					}
-					
-					boolean next = coins[coinNum].tick();
-					if(next){
-						coinNum++;
-						if(coinNum >= coins.length){
-							exit();
+
+					boolean next = coins.getLast().tick();
+					if (next) {
+						Coin coin = coins.getLast();
+						if (BUCKET.getX() < coin.getX()
+								&& BUCKET.getX() + BUCKET.WIDTH > coin.getX()
+										+ coin.WIDTH) {
+							coin.success();
+						} else {
+							coin.fail();
 						}
+						coins.addLast(new Coin(random.nextDouble()));
 					}
 					repaint();
 				}
@@ -148,9 +226,6 @@ public class MainGUI extends JFrame implements KeyListener {
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
 
-
 	}
-
-
 
 }
